@@ -1,7 +1,15 @@
 #!/bin/bash
 
+# 11g references
+#   http://docs.oracle.com/cd/E11882_01/rac.112/e41960/cloneracwithoui.htm#RACAD8292
+# 12c references
+#
+
+
 # TODO: portare queste variabili in un file esterno
 export DCLI_GROUP='/home/oracle/ebm2n.dcli'
+ls -lh $DCLI_GROUP
+cat $DCLI_GROUP
 export TARGET_HOME_PARENT='/u01/app/oracle/product/12.1.0.2'
 export DBHOME_ARCHIVE='dbhome_12.1.0.2.170418.tar.gz'
 export DBHOME_ARCHIVE_PATH='/zfssa/scripts/PATCHES'
@@ -23,14 +31,17 @@ dcli -l oracle -g $DCLI_GROUP hostname
 #   - directory already exists
 #   - or directory created
 dcli -l oracle -g $DCLI_GROUP mkdir $TARGET_HOME_PARENT
+dcli -l oracle -g $DCLI_GROUP "stat $TARGET_HOME_PARENT"
+
+# copy OH archive from source to target, if necessary
+# dcli -l oracle -g $DCLI_GROUP -f /zfssa/scripts/PATCHES/${DBHOME_ARCHIVE} -d ${TARGET_HOME_PARENT}
 
 # verify before extracting
 dcli -l oracle -g $DCLI_GROUP "ls -lh ${DBHOME_ARCHIVE_PATH}/${DBHOME_ARCHIVE}"
+dcli -l oracle -g $DCLI_GROUP "md5sum ${DBHOME_ARCHIVE_PATH}/${DBHOME_ARCHIVE}"
 
 # extract OH archive from ZFS
 dcli -l oracle -g $DCLI_GROUP "tar xzvf ${DBHOME_ARCHIVE_PATH}/${DBHOME_ARCHIVE} -C ${TARGET_HOME_PARENT}"
-# alternative: if ZFS or NFS share is not available, copy via scp
-# "scp -c arcfour ebm1ndbadm03:/tmp/dbhome_170418.tar.gz /u01/app/oracle/product/12.1.0.2/"
 
 # cleanup data from other/old installation
 dcli -l oracle -g $DCLI_GROUP "rm -fr ${TARGET_HOME_PARENT}/${DBHOME_NAME}/rdbms/audit/* ${TARGET_HOME_PARENT}/${DBHOME_NAME}/log/*"
@@ -38,6 +49,11 @@ dcli -l oracle -g $DCLI_GROUP "rm -fr ${TARGET_HOME_PARENT}/${DBHOME_NAME}/rdbms
 # check free space / dbhome size
 dcli -l oracle -g $DCLI_GROUP "du -hs ${TARGET_HOME_PARENT}/${DBHOME_NAME}"
 dcli -l oracle -g $DCLI_GROUP "df -h ${TARGET_HOME_PARENT}/${DBHOME_NAME}"
+
+# if OH archive has been copied from source to target, remove it
+# dcli -l oracle -g $DCLI_GROUP ls -lh ${TARGET_HOME_PARENT}/${DBHOME_ARCHIVE}
+# dcli -l oracle -g $DCLI_GROUP rm ${TARGET_HOME_PARENT}/${DBHOME_ARCHIVE}
+# dcli -l oracle -g $DCLI_GROUP ls -lh ${TARGET_HOME_PARENT}/${DBHOME_ARCHIVE}
 
 
 # create clone script
@@ -59,7 +75,7 @@ echo "CTRL-C to ABORT now!"
 sleep 5
 cd "$TARGET_ORACLE_HOME/clone/bin"
 perl clone.pl '-O "CLUSTER_NODES={$CLONE_CLUSTER_NODES}"' -O "LOCAL_NODE=\$NODE_NAME" ORACLE_BASE=${TARGET_ORACLE_BASE}  ORACLE_HOME=${TARGET_ORACLE_HOME}  ORACLE_HOME_NAME=${INVENTORY_HOME_NAME} '-O -noConfig'
-cd $START_DIRECTORY
+cd \$START_DIRECTORY
 EOF
 chmod +x $CLONE_COMMAND_SCRIPT
 
@@ -67,9 +83,7 @@ dcli -l oracle -g $DCLI_GROUP -f $CLONE_COMMAND_SCRIPT -d /tmp/
 dcli -l oracle -g $DCLI_GROUP md5sum $CLONE_COMMAND_SCRIPT
 
 
-# TODO
-# testare esecuzione di $CLONE_COMMAND_SCRIPT attraverso dcli
-# 2017.06.29: testato solo manualmente su ogni nodo
+# execute clone process on each node
 dcli -l oracle -g $DCLI_GROUP $CLONE_COMMAND_SCRIPT
 
 
