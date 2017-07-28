@@ -5,6 +5,8 @@
 # 12c references
 #
 
+# create OH archive
+# sudo tar cpvzf dbhome_ogg_170418.tar.gz --exclude=*/audit/* --exclude=*/log/* dbhome_ogg_170418
 
 # TODO: portare queste variabili in un file esterno
 export DCLI_GROUP='/home/oracle/ebm2n.dcli'
@@ -34,7 +36,8 @@ dcli -l oracle -g $DCLI_GROUP mkdir $TARGET_HOME_PARENT
 dcli -l oracle -g $DCLI_GROUP "stat $TARGET_HOME_PARENT"
 
 # copy OH archive from source to target, if necessary
-# dcli -l oracle -g $DCLI_GROUP -f /zfssa/scripts/PATCHES/${DBHOME_ARCHIVE} -d ${TARGET_HOME_PARENT}
+# dcli -l oracle -g $DCLI_GROUP -f ${DBHOME_ARCHIVE_PATH}/${DBHOME_ARCHIVE} -d ${TARGET_HOME_PARENT}
+# export DBHOME_ARCHIVE_PATH=${TARGET_HOME_PARENT}
 
 # verify before extracting
 dcli -l oracle -g $DCLI_GROUP "ls -lh ${DBHOME_ARCHIVE_PATH}/${DBHOME_ARCHIVE}"
@@ -85,6 +88,8 @@ dcli -l oracle -g $DCLI_GROUP md5sum $CLONE_COMMAND_SCRIPT
 
 # execute clone process on each node
 dcli -l oracle -g $DCLI_GROUP $CLONE_COMMAND_SCRIPT
+# dcli -l oracle -g $DCLI_GROUP 'grep ORA- /u01/app/oraInventory/logs/cloneActions2017-07-24_??-??-????.log'
+# dcli -l oracle -g $DCLI_GROUP 'grep "was successful" /u01/app/oraInventory/logs/cloneActions2017-07-24_??-??-????.log'
 
 
 # finalize home clone process
@@ -101,7 +106,6 @@ sudo $CLONE_ROOT_COMMAND_SCRIPT
 #   ebm2ndbadm03: Check /u01/app/oracle/product/12.1.0.2/dbhome_170418/install/root_ebm2ndbadm03.gbm.lan_2017-06-29_13-33-46.log for the output of root script
 #   ebm2ndbadm04: Check /u01/app/oracle/product/12.1.0.2/dbhome_170418/install/root_ebm2ndbadm04.gbm.lan_2017-06-29_13-33-46.log for the output of root script
 # grep ORA- /path/to/file
-
 
 # final check
 dcli -l oracle -g $DCLI_GROUP ${TARGET_ORACLE_HOME}/OPatch/opatch lspatches
