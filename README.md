@@ -1,0 +1,2 @@
+- listener.hunter.py: estrae l'elenco di host univoci dal log di un listener
+- asm-du.sh: visualizza informazioni sui diskgroup ASM e l'occupazione di ciascun database
