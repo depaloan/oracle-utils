@@ -1,2 +1,3 @@
-- listener.hunter.py: estrae l'elenco di host univoci dal log di un listener
-- asm-du.sh: visualizza informazioni sui diskgroup ASM e l'occupazione di ciascun database
+- *listener.hunter.py*. Estrae l'elenco di host univoci dal log di un listener
+- *asm-du.sh*. Visualizza informazioni sui diskgroup ASM e l'occupazione di ciascun database
+- *datapump-command-generator.py*. Genera comandi di import/export Datapump
