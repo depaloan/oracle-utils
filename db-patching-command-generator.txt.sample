@@ -1,0 +1,3 @@
+SAMPLE11g;/u01/app/oracle/product/11.2.0.4/dbhome_181016;11g;SAMPLE11gBC;SAMPLE11gDR
+SAMPLE12c;/u01/app/oracle/product/12.1.0.2/dbhome_181016;12c;SAMPLE12cBC;NONE
+FOOBAR12c;/u01/app/oracle/product/12.1.0.2/dbhome_181016;12c;NONE;NONE

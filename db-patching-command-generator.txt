@@ -1,2 +1,7 @@
-SAMPLE11g;/u01/app/oracle/product/11.2.0.4/dbhome_181016;11g
-SAMPLE12c;/u01/app/oracle/product/12.1.0.2/dbhome_181016;12c
+TECCLI1N;/u01/app/oracle/product/12.1.0.2/dbhome_181016;12c;TECCLI2N;TECCLI3
+TOL1N;/u01/app/oracle/product/12.1.0.2/dbhome_181016;12c;TOL2N;TOL3
+IAM1N;/u01/app/oracle/product/12.1.0.2/dbhome_181016;12c;IAM2N;IAM3
+MOM1N;/u01/app/oracle/product/11.2.0.4/dbhome_181016;11g;MOM2N;MOM3
+SOA1N;/u01/app/oracle/product/11.2.0.4/dbhome_181016;11g;SOA2N;SOA3
+IAMCLI1N;/u01/app/oracle/product/11.2.0.4/dbhome_181016;11g;IAMCLI2N;IAMCLI3
+CRM2N;/u01/app/oracle/product/12.1.0.2/dbhome_crm_181016;12c;CRM1N;NONE
