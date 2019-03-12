@@ -15,12 +15,57 @@
 with open('db-patching-command-generator.txt') as database_list:
     for line in database_list:
         line=line.rstrip()
-        database_name,target_oh,release=line.split(';')
+        database_name,target_oh,release,database_bc,database_dr=line.split(';')
 
         if (release not in ['11g', '12c']):
             print("ERROR. Release {0} not recognized for database {1}".format(release,database_name))
         else:
-            print("source .{0}.profile".format(database_name))
+            # only when Data Guard is configured
+            # dgmgrl commands to disable DG replicas
+            if (database_bc != 'NONE'):
+                print("# {0}: disable Data Guard replica".format(database_name))
+                print("source ~/.{0}.profile".format(database_name))
+                print("/zfssa/scripts/ODG/{0}/dgmgrl_{0}.sh < /zfssa/scripts/ODG/{0}/{0}-db.patching-prepare.dgmgrl".format(database_name))
+                print ("")
+
+            if (database_dr != 'NONE'):
+                print("# {0}: DR".format(database_dr))
+                print("source ~/.{0}.profile".format(database_dr))
+                if (release == '11g'):
+                    print("srvctl status database -d {0} -v".format(database_dr))
+                    print("srvctl stop database -d {0}".format(database_dr))
+                    print("srvctl modify database -d {0} -o {1}".format(database_dr,target_oh))
+                    print("srvctl start database -d {0}".format(database_dr))
+                    print("srvctl status database -d {0} -v".format(database_dr))
+                elif (release == '12c'):
+                    print("srvctl status database -db {0} -v".format(database_dr))
+                    print("srvctl stop database -db {0}".format(database_dr))
+                    print("srvctl modify database -db {0} -oraclehome {1}".format(database_dr,target_oh))
+                    print("srvctl start database -db {0}".format(database_dr))
+                    print("srvctl status database -db {0} -v".format(database_dr))
+                print("# INFO. Remember to modify the ORACLE_HOME variable in ~/.{0}.profile".format(database_dr))
+                print ("")
+
+            if (database_bc != 'NONE'):
+                print("# {0}: BC".format(database_bc))
+                print("source ~/.{0}.profile".format(database_bc))
+                if (release == '11g'):
+                    print("srvctl status database -d {0} -v".format(database_bc))
+                    print("srvctl stop database -d {0}".format(database_bc))
+                    print("srvctl modify database -d {0} -o {1}".format(database_bc,target_oh))
+                    print("srvctl start database -d {0}".format(database_bc))
+                    print("srvctl status database -d {0} -v".format(database_bc))
+                elif (release == '12c'):
+                    print("srvctl status database -db {0} -v".format(database_bc))
+                    print("srvctl stop database -db {0}".format(database_bc))
+                    print("srvctl modify database -db {0} -oraclehome {1}".format(database_bc,target_oh))
+                    print("srvctl start database -db {0}".format(database_bc))
+                    print("srvctl status database -db {0} -v".format(database_bc))
+                print("# INFO. Remember to modify the ORACLE_HOME variable in ~/.{0}.profile".format(database_bc))
+                print ("")
+
+            print("# {0}: PR".format(database_name))
+            print("source ~/.{0}.profile".format(database_name))
             print("srvctl status database -d {0} -v".format(database_name))
 
             if (release == '11g'):
@@ -59,5 +104,18 @@ with open('db-patching-command-generator.txt') as database_list:
                 print("# execute the following command in SQL*Plus: @?/rdbms/admin/catbundle.sql exa apply")
             elif (release == '12c'):
                 print("datapatch -verbose")
+            print ("")
 
+            # only when Data Guard is configured
+            # dgmgrl commands to enable DG replicas
+            if (database_bc != 'NONE'):
+                print("# {0}: enable Data Guard replica".format(database_name))
+                print("source ~/.{0}.profile".format(database_name))
+                print("/zfssa/scripts/ODG/{0}/dgmgrl_{0}.sh < /zfssa/scripts/ODG/{0}/{0}-db.patching-restore.dgmgrl".format(database_name))
+                print ("")
+
+            print ("")
+            print ("")
+            print ("")
+            print ("")
             print ("")
